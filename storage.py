@@ -47,8 +47,8 @@ def save(prompt: str, resp_a: llm.LLMResponse, resp_b: llm.LLMResponse, preferen
 def record_count() -> int:
     if not DATA_FILE.exists():
         return 0
-    with DATA_FILE.open() as f:
-        return sum(1 for _ in f) - 1  # subtract header
+    with DATA_FILE.open(newline="") as f:
+        return sum(1 for _ in csv.reader(f)) - 1  # subtract header
 
 
 def csv_bytes() -> bytes:
