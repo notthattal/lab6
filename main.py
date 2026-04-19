@@ -1,18 +1,22 @@
 import os
-
+from dotenv import load_dotenv
 import streamlit as st
-
 import llm
 import storage
+
+load_dotenv()
 
 st.set_page_config(page_title="RLHF Data Collector", layout="wide")
 st.title("RLHF Preference Data Collector")
 st.caption(f"Model: `{llm.LLM_MODEL}`")
 
+api_key = os.environ.get("OPENAI_API_KEY", "")
+if not api_key:
+    st.error("OPENAI_API_KEY is not set. Add it to your .env file and restart.")
+    st.stop()
+
 # --- Sidebar ---
 with st.sidebar:
-    api_key = st.text_input("OpenAI API Key", type="password", value=os.environ.get("OPENAI_API_KEY", ""))
-    st.divider()
     count = storage.record_count()
     st.metric("Records saved", count)
     if count > 0:
@@ -22,10 +26,6 @@ with st.sidebar:
             file_name="preference_data.csv",
             mime="text/csv",
         )
-
-if not api_key:
-    st.warning("Enter your OpenAI API key in the sidebar to continue.")
-    st.stop()
 
 client = llm.get_client(api_key)
 
